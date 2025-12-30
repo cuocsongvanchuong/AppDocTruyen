@@ -1,16 +1,24 @@
 package com.example.truyenoffline.model
 
+import com.google.gson.annotations.SerializedName
+
 data class Story(
     val id: String,
-    val title: String,       // Tên truyện
-    val coverUrl: String,    // Link ảnh bìa
-    val author: String,      // Tác giả
-    val description: String  // Mô tả ngắn
+    val title: String,
+    val author: String,
+    val coverUrl: String,
+    val description: String,
+    
+    // Them truong nay de biet ten thu muc tren GitHub
+    @SerializedName("slug")
+    val slug: String = "",
+    
+    @SerializedName("chap_count")
+    val totalChapters: Int = 0
 )
 
-// Tạo danh sách truyện giả để test giao diện
+// List mau de test khi mat mang (Fallback)
 val sampleStories = listOf(
-    Story("1", "Dế Mèn Phiêu Lưu Ký", "https://upload.wikimedia.org/wikipedia/vi/6/67/DeMenPhieuLuuKy-Bia1.jpg", "Tô Hoài", "Cuộc phiêu lưu của chú dế mèn..."),
-    Story("2", "Đất Rừng Phương Nam", "https://upload.wikimedia.org/wikipedia/vi/a/a2/Dat_rung_phuong_Nam_1997.jpg", "Đoàn Giỏi", "Câu chuyện về cậu bé An..."),
-    Story("3", "Truyện Test GitHub", "", "Admin", "Truyện này chưa có ảnh bìa...")
+    Story("1", "Dế Mèn Phiêu Lưu Ký", "Tô Hoài", "https://upload.wikimedia.org/wikipedia/vi/6/67/DeMenPhieuLuuKy-Bia1.jpg", "Truyện thiếu nhi...", "de-men", 10),
+    Story("2", "Đất Rừng Phương Nam", "Đoàn Giỏi", "https://upload.wikimedia.org/wikipedia/vi/a/a2/Dat_rung_phuong_Nam_1997.jpg", "Bối cảnh Nam Bộ...", "dat-rung", 20)
 )
