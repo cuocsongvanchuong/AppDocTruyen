@@ -19,27 +19,43 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.truyenoffline.model.Story
-import com.example.truyenoffline.model.sampleStories
-import com.example.truyenoffline.network.RetrofitClient
-import kotlinx.coroutines.launch
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(navController: NavController, storySlug: String?) {
-    // 1. Tim truyen trong list mau truoc (de phong mat mang)
-    var story by remember { mutableStateOf(sampleStories.find { it.slug == storySlug }) }
-    
-    // 2. Thu tim trong danh sach online (neu co)
-    LaunchedEffect(storySlug) {
-        if (storySlug != null) {
+fun DetailScreen(navController: NavController, storyId: String?) {
+    var story by remember { mutableStateOf<Story?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    // 1. Dùng ID để lấy thông tin chi tiết từ Firebase
+    LaunchedEffect(storyId) {
+        if (storyId != null) {
             try {
-                val list = RetrofitClient.api.getStoryList()
-                val onlineStory = list.find { it.slug == storySlug }
-                if (onlineStory != null) {
-                    story = onlineStory
+                val db = Firebase.firestore
+                // Giả sử field định danh trên Firebase là 'slug' hoặc 'id'
+                // Nếu bạn dùng ID tự sinh của Firebase thì dùng document(storyId)
+                // Nếu bạn dùng slug làm ID thì query như sau:
+                
+                val docRef = db.collection("stories").document(storyId)
+                val snapshot = docRef.get().await()
+                
+                if (snapshot.exists()) {
+                    story = snapshot.toObject(Story::class.java)?.copy(id = snapshot.id)
+                } else {
+                    // Nếu không tìm thấy theo ID, thử tìm theo Slug (trường hợp id truyền vào là slug)
+                    val querySnapshot = db.collection("stories")
+                        .whereEqualTo("slug", storyId)
+                        .get().await()
+                    if (!querySnapshot.isEmpty) {
+                        story = querySnapshot.documents[0].toObject(Story::class.java)
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+            } finally {
+                isLoading = false
             }
         }
     }
@@ -47,7 +63,7 @@ fun DetailScreen(navController: NavController, storySlug: String?) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Chi Tiết Truyện") },
+                title = { Text(if (story != null) story!!.title else "Đang tải...") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -59,8 +75,12 @@ fun DetailScreen(navController: NavController, storySlug: String?) {
             )
         }
     ) { innerPadding ->
-        if (story != null) {
-            val currentStory = story!! // Ep kieu an toan vi da check null
+        if (isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else if (story != null) {
+            val currentStory = story!!
             Column(
                 modifier = Modifier
                     .padding(innerPadding)
@@ -69,11 +89,12 @@ fun DetailScreen(navController: NavController, storySlug: String?) {
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Ảnh bìa
                 AsyncImage(
                     model = currentStory.coverUrl,
                     contentDescription = null,
                     modifier = Modifier
-                        .height(250.dp)
+                        .height(260.dp)
                         .width(180.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color.Gray),
@@ -82,6 +103,7 @@ fun DetailScreen(navController: NavController, storySlug: String?) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Tên truyện
                 Text(
                     text = currentStory.title,
                     style = MaterialTheme.typography.headlineSmall,
@@ -94,15 +116,27 @@ fun DetailScreen(navController: NavController, storySlug: String?) {
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.DarkGray
                 )
+                
+                Text(
+                    text = "Số chương: ${currentStory.totalChapters}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // Nút Đọc
                 Button(
-                    onClick = { /* TODO: Mo man hinh doc truyen */ },
+                    // Bấm nút này sẽ chuyển sang màn hình Đọc, truyền theo cái SLUG
+                    onClick = { 
+                        if (currentStory.slug.isNotEmpty()) {
+                            navController.navigate("read/${currentStory.slug}/1") // Mặc định đọc chương 1
+                        }
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().height(50.dp)
                 ) {
-                    Text("ĐỌC NGAY")
+                    Text("ĐỌC NGAY", fontWeight = FontWeight.Bold)
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -116,13 +150,13 @@ fun DetailScreen(navController: NavController, storySlug: String?) {
                 Text(
                     text = currentStory.description,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
+                    color = Color.DarkGray,
                     modifier = Modifier.padding(top = 8.dp).align(Alignment.Start)
                 )
             }
         } else {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Đang tải hoặc không tìm thấy truyện...")
+                Text("Không tìm thấy thông tin truyện trên Firebase!")
             }
         }
     }
