@@ -24,11 +24,9 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(navController = navController, startDestination = "home") {
                         composable("home") {
-                            // Goi HomeScreen tu file moi
                             HomeScreen(navController)
                         }
                         composable("detail/{storySlug}") { backStackEntry ->
-                            // Nhan Slug thay vi ID
                             val slug = backStackEntry.arguments?.getString("storySlug")
                             DetailScreen(navController, slug)
                         }

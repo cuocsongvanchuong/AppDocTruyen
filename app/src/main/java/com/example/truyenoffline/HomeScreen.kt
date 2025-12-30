@@ -24,22 +24,18 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
-    // 1. Khai bao bien luu du lieu
     var stories by remember { mutableStateOf<List<Story>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
-    // 2. Tu dong tai du lieu khi mo man hinh
     LaunchedEffect(Unit) {
         scope.launch {
             try {
-                // Goi API lay danh sach tu GitHub
                 val list = RetrofitClient.api.getStoryList()
                 stories = list
             } catch (e: Exception) {
                 errorMessage = "Lỗi mạng: ${e.message}"
-                // Neu loi thi dung tam du lieu mau
                 stories = sampleStories
             } finally {
                 isLoading = false
@@ -74,7 +70,6 @@ fun HomeScreen(navController: NavController) {
                 
                 items(stories) { story ->
                     StoryItem(story) {
-                        // Truyen Slug sang man hinh Chi tiet
                         navController.navigate("detail/${story.slug}")
                     }
                 }

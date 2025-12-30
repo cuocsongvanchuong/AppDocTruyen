@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-// DUONG DAN QUAN TRONG: Thay username/repo cua ban vao day neu can
+// URL Repo cua ban
 const val BASE_URL = "https://raw.githubusercontent.com/nguyenquynhduc/truyen-quoc-dinh-data/main/"
 
 interface GithubApi {
