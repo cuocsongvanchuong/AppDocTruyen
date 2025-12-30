@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Person // DA THEM DONG NAY
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -80,7 +81,7 @@ fun HomeScreen(navController: NavController) {
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 
-                // 2. BANNER (Truyen noi bat nhat) - Lay truyen dau tien
+                // 2. BANNER (Truyen noi bat nhat)
                 if (stories.isNotEmpty()) {
                     item {
                         BannerSection(stories.first()) {
@@ -97,7 +98,7 @@ fun HomeScreen(navController: NavController) {
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(stories.take(5)) { story -> // Lay 5 truyen dau
+                        items(stories.take(5)) { story ->
                             CardItemHorizontal(story) {
                                 val id = if (story.slug.isNotEmpty()) story.slug else story.id
                                 navController.navigate("detail/$id")
@@ -106,7 +107,7 @@ fun HomeScreen(navController: NavController) {
                     }
                 }
 
-                // 4. MOI CAP NHAT (Danh sach doc - Style List View)
+                // 4. MOI CAP NHAT (Danh sach doc)
                 item {
                     Spacer(modifier = Modifier.height(20.dp))
                     SectionHeader("Mới Cập Nhật")
@@ -139,7 +140,6 @@ fun SectionHeader(title: String) {
     }
 }
 
-// Banner to o tren cung
 @Composable
 fun BannerSection(story: Story, onClick: () -> Unit) {
     Box(
@@ -154,7 +154,6 @@ fun BannerSection(story: Story, onClick: () -> Unit) {
             model = story.coverUrl, contentDescription = null,
             modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop
         )
-        // Lop phu den
         Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)))
         
         Column(
@@ -173,7 +172,6 @@ fun BannerSection(story: Story, onClick: () -> Unit) {
     }
 }
 
-// Card dung cho list luot ngang (De cu)
 @Composable
 fun CardItemHorizontal(story: Story, onClick: () -> Unit) {
     Column(
@@ -192,7 +190,6 @@ fun CardItemHorizontal(story: Story, onClick: () -> Unit) {
     }
 }
 
-// Card ngang cho list doc (Moi cap nhat)
 @Composable
 fun CardItemVertical(story: Story, onClick: () -> Unit) {
     Row(
@@ -201,7 +198,6 @@ fun CardItemVertical(story: Story, onClick: () -> Unit) {
             .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        // Anh nho ben trai
         AsyncImage(
             model = story.coverUrl, contentDescription = null,
             modifier = Modifier
@@ -213,12 +209,12 @@ fun CardItemVertical(story: Story, onClick: () -> Unit) {
         
         Spacer(modifier = Modifier.width(12.dp))
         
-        // Thong tin ben phai
         Column(modifier = Modifier.weight(1f)) {
             Text(text = story.title, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Spacer(modifier = Modifier.height(4.dp))
             
             Row(verticalAlignment = Alignment.CenterVertically) {
+                // Icon Person da duoc import
                 Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(12.dp), tint = Color.Gray)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(text = story.author.ifEmpty { "Đang cập nhật" }, fontSize = 12.sp, color = Color.Gray)
@@ -226,7 +222,6 @@ fun CardItemVertical(story: Story, onClick: () -> Unit) {
             
             Spacer(modifier = Modifier.height(8.dp))
             
-            // Badge chuong
             Row {
                 Text(
                     text = "Chương ${story.totalChapters}",
