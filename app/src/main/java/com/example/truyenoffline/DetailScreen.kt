@@ -32,20 +32,17 @@ fun DetailScreen(navController: NavController, storyId: String?) {
         if (storyId != null) {
             val db = Firebase.firestore
             
-            // Tim theo ID
+            // 1. Tim theo ID Document
             db.collection("stories").document(storyId).get()
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
                         try {
-                            // Lay ID tu document
                             val loadedStory = document.toObject(Story::class.java)?.copy(id = document.id)
                             story = loadedStory
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
+                        } catch (e: Exception) { e.printStackTrace() }
                         isLoading = false
                     } else {
-                        // Tim theo Slug
+                        // 2. Tim theo Slug
                         db.collection("stories")
                             .whereEqualTo("slug", storyId)
                             .get()
@@ -53,9 +50,7 @@ fun DetailScreen(navController: NavController, storyId: String?) {
                                 if (!documents.isEmpty) {
                                     try {
                                         story = documents.documents[0].toObject(Story::class.java)
-                                    } catch (e: Exception) {
-                                        e.printStackTrace()
-                                    }
+                                    } catch (e: Exception) { e.printStackTrace() }
                                 }
                                 isLoading = false
                             }
@@ -63,6 +58,8 @@ fun DetailScreen(navController: NavController, storyId: String?) {
                     }
                 }
                 .addOnFailureListener { isLoading = false }
+        } else {
+            isLoading = false
         }
     }
 
@@ -158,7 +155,7 @@ fun DetailScreen(navController: NavController, storyId: String?) {
             }
         } else {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Không tìm thấy thông tin (Kiểm tra lại Firebase)")
+                Text("Không tìm thấy thông tin truyện!")
             }
         }
     }
