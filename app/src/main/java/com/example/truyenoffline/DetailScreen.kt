@@ -21,8 +21,6 @@ import coil.compose.AsyncImage
 import com.example.truyenoffline.model.Story
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-// Import quan trong cho await
-import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,29 +30,34 @@ fun DetailScreen(navController: NavController, storyId: String?) {
 
     LaunchedEffect(storyId) {
         if (storyId != null) {
-            try {
-                val db = Firebase.firestore
-                
-                // Thu tim theo ID document truoc
-                val docRef = db.collection("stories").document(storyId)
-                val snapshot = docRef.get().await()
-                
-                if (snapshot.exists()) {
-                    story = snapshot.toObject(Story::class.java)?.copy(id = snapshot.id)
-                } else {
-                    // Neu khong co ID, thu tim theo field 'slug'
-                    val querySnapshot = db.collection("stories")
-                        .whereEqualTo("slug", storyId)
-                        .get().await()
-                    if (!querySnapshot.isEmpty) {
-                        story = querySnapshot.documents[0].toObject(Story::class.java)
+            val db = Firebase.firestore
+            
+            // CACH 2: DUNG CALLBACK (AN TOAN TUYET DOI)
+            // 1. Thu tim theo ID Document
+            db.collection("stories").document(storyId).get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        story = document.toObject(Story::class.java)?.copy(id = document.id)
+                        isLoading = false
+                    } else {
+                        // 2. Neu khong co, thu tim theo field slug
+                        db.collection("stories")
+                            .whereEqualTo("slug", storyId)
+                            .get()
+                            .addOnSuccessListener { documents ->
+                                if (!documents.isEmpty) {
+                                    story = documents.documents[0].toObject(Story::class.java)
+                                }
+                                isLoading = false
+                            }
+                            .addOnFailureListener { 
+                                isLoading = false 
+                            }
                     }
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                isLoading = false
-            }
+                .addOnFailureListener {
+                    isLoading = false
+                }
         }
     }
 
@@ -150,7 +153,7 @@ fun DetailScreen(navController: NavController, storyId: String?) {
             }
         } else {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Không tìm thấy thông tin truyện!")
+                Text("Không tìm thấy thông tin truyện trên Firebase!")
             }
         }
     }
