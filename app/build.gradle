@@ -73,6 +73,6 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:32.7.0')
     implementation 'com.google.firebase:firebase-firestore'
     
-    // THEM THU VIEN ICON DAY DU (De lam Bottom Bar)
-    implementation "androidx.compose.material:material-icons-extended:1.5.4"
+    // DA XOA THU VIEN ICON NANG (material-icons-extended)
+    // Chi dung mac dinh (Core) la du
 }

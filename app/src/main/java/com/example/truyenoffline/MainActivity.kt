@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LibraryBooks
+import androidx.compose.material.icons.filled.List // Doi thanh List (Co san)
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,7 +27,6 @@ class MainActivity : ComponentActivity() {
             TruyenOfflineTheme {
                 val navController = rememberNavController()
                 
-                // Kiem tra xem co dang o man hinh chinh khong de hien BottomBar
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
                 val showBottomBar = currentRoute == "home" || currentRoute == "library" || currentRoute == "profile"
@@ -37,7 +36,7 @@ class MainActivity : ComponentActivity() {
                         if (showBottomBar) {
                             NavigationBar(
                                 containerColor = Color.White,
-                                contentColor = Color(0xFFFBBF24) // Mau Vang Gold
+                                contentColor = Color(0xFFFBBF24)
                             ) {
                                 NavigationBarItem(
                                     icon = { Icon(Icons.Default.Home, contentDescription = null) },
@@ -47,17 +46,18 @@ class MainActivity : ComponentActivity() {
                                     colors = NavigationBarItemDefaults.colors(selectedIconColor = Color(0xFFFBBF24), indicatorColor = Color(0xFFFFF7ED))
                                 )
                                 NavigationBarItem(
-                                    icon = { Icon(Icons.Default.LibraryBooks, contentDescription = null) },
+                                    // Dung Icon List thay cho LibraryBooks
+                                    icon = { Icon(Icons.Default.List, contentDescription = null) },
                                     label = { Text("Tủ sách") },
                                     selected = currentRoute == "library",
-                                    onClick = { /* TODO: Lam man hinh Tu Sach */ },
+                                    onClick = { /* TODO */ },
                                     colors = NavigationBarItemDefaults.colors(selectedIconColor = Color(0xFFFBBF24), indicatorColor = Color(0xFFFFF7ED))
                                 )
                                 NavigationBarItem(
                                     icon = { Icon(Icons.Default.Person, contentDescription = null) },
                                     label = { Text("Cá nhân") },
                                     selected = currentRoute == "profile",
-                                    onClick = { /* TODO: Lam man hinh Ca Nhan */ },
+                                    onClick = { /* TODO */ },
                                     colors = NavigationBarItemDefaults.colors(selectedIconColor = Color(0xFFFBBF24), indicatorColor = Color(0xFFFFF7ED))
                                 )
                             }
