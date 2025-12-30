@@ -21,6 +21,7 @@ import coil.compose.AsyncImage
 import com.example.truyenoffline.model.Story
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+// Import quan trong cho await
 import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,22 +30,19 @@ fun DetailScreen(navController: NavController, storyId: String?) {
     var story by remember { mutableStateOf<Story?>(null) }
     var isLoading by remember { mutableStateOf(true) }
 
-    // 1. Dùng ID để lấy thông tin chi tiết từ Firebase
     LaunchedEffect(storyId) {
         if (storyId != null) {
             try {
                 val db = Firebase.firestore
-                // Giả sử field định danh trên Firebase là 'slug' hoặc 'id'
-                // Nếu bạn dùng ID tự sinh của Firebase thì dùng document(storyId)
-                // Nếu bạn dùng slug làm ID thì query như sau:
                 
+                // Thu tim theo ID document truoc
                 val docRef = db.collection("stories").document(storyId)
                 val snapshot = docRef.get().await()
                 
                 if (snapshot.exists()) {
                     story = snapshot.toObject(Story::class.java)?.copy(id = snapshot.id)
                 } else {
-                    // Nếu không tìm thấy theo ID, thử tìm theo Slug (trường hợp id truyền vào là slug)
+                    // Neu khong co ID, thu tim theo field 'slug'
                     val querySnapshot = db.collection("stories")
                         .whereEqualTo("slug", storyId)
                         .get().await()
@@ -89,7 +87,6 @@ fun DetailScreen(navController: NavController, storyId: String?) {
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Ảnh bìa
                 AsyncImage(
                     model = currentStory.coverUrl,
                     contentDescription = null,
@@ -103,7 +100,6 @@ fun DetailScreen(navController: NavController, storyId: String?) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Tên truyện
                 Text(
                     text = currentStory.title,
                     style = MaterialTheme.typography.headlineSmall,
@@ -125,12 +121,10 @@ fun DetailScreen(navController: NavController, storyId: String?) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Nút Đọc
                 Button(
-                    // Bấm nút này sẽ chuyển sang màn hình Đọc, truyền theo cái SLUG
                     onClick = { 
                         if (currentStory.slug.isNotEmpty()) {
-                            navController.navigate("read/${currentStory.slug}/1") // Mặc định đọc chương 1
+                            navController.navigate("read/${currentStory.slug}/1")
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
@@ -156,7 +150,7 @@ fun DetailScreen(navController: NavController, storyId: String?) {
             }
         } else {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Không tìm thấy thông tin truyện trên Firebase!")
+                Text("Không tìm thấy thông tin truyện!")
             }
         }
     }
