@@ -15,7 +15,7 @@ android {
         versionCode 1
         versionName "1.0"
         
-        // QUAN TRONG: MultiDex
+        // Van giu dong nay
         multiDexEnabled true
         
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -45,17 +45,25 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion '1.5.1'
     }
+    
+    // BO LOC MANH ME: Loai bo moi file rac gay xung dot
     packaging {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            excludes += 'META-INF/DEPENDENCIES'
+            excludes += 'META-INF/LICENSE'
+            excludes += 'META-INF/LICENSE.txt'
+            excludes += 'META-INF/license.txt'
+            excludes += 'META-INF/NOTICE'
+            excludes += 'META-INF/NOTICE.txt'
+            excludes += 'META-INF/notice.txt'
+            excludes += 'META-INF/ASL2.0'
+            excludes += 'META-INF/*.kotlin_module'
         }
     }
 }
 
 dependencies {
-    // MultiDex
-    implementation 'androidx.multidex:multidex:2.0.1'
-
     // Android Core
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
@@ -68,13 +76,15 @@ dependencies {
     implementation 'androidx.compose.ui:ui-tooling-preview'
     implementation 'androidx.compose.material3:material3'
     
-    // Thu vien anh & mang
+    // Anh & Mang
     implementation 'io.coil-kt:coil-compose:2.5.0'
     implementation "androidx.navigation:navigation-compose:2.7.7"
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     
-    // FIREBASE (Chi dung Firestore, khong them thu vien thua)
-    implementation platform('com.google.firebase:firebase-bom:32.7.0')
+    // FIREBASE - Dung ban thap hon 1 chut cho lanh (32.1.0)
+    implementation platform('com.google.firebase:firebase-bom:32.1.0')
     implementation 'com.google.firebase:firebase-firestore-ktx'
+    
+    // LUY Y: Da xoa thu vien multidex va coroutines thua
 }
