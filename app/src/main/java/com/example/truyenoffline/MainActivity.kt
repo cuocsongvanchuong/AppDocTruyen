@@ -17,8 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage // Thư viện load ảnh
+import coil.compose.AsyncImage
 import com.example.truyenoffline.model.Story
 import com.example.truyenoffline.model.sampleStories
 import com.example.truyenoffline.ui.theme.TruyenOfflineTheme
@@ -28,7 +27,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TruyenOfflineTheme {
-                // Khung chứa toàn bộ App
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -47,16 +45,15 @@ fun HomeScreen() {
         topBar = {
             TopAppBar(
                 title = { Text("Thư Viện Truyện", fontWeight = FontWeight.Bold) },
-                colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary // Màu vàng
+                colors = TopAppBarDefaults.topAppBarColors( // DA SUA: Dung ham moi nhat
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             )
         }
     ) { innerPadding ->
-        // Danh sách cuộn (LazyColumn = RecyclerView ngày xưa)
         LazyColumn(
             modifier = Modifier.padding(innerPadding).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp) // Khoảng cách giữa các truyện
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(sampleStories) { story ->
                 StoryItem(story)
@@ -74,7 +71,6 @@ fun StoryItem(story: Story) {
         modifier = Modifier.fillMaxWidth().height(120.dp)
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
-            // Ảnh bìa
             AsyncImage(
                 model = story.coverUrl,
                 contentDescription = null,
@@ -84,8 +80,6 @@ fun StoryItem(story: Story) {
                     .background(Color.Gray),
                 contentScale = ContentScale.Crop
             )
-            
-            // Thông tin chữ
             Column(
                 modifier = Modifier
                     .padding(12.dp)
