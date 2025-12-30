@@ -18,8 +18,8 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.truyenoffline.model.Story
 import com.example.truyenoffline.model.sampleStories
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,22 +28,24 @@ fun HomeScreen(navController: NavController) {
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
 
-    // Tu dong tai du lieu tu Firebase
     LaunchedEffect(Unit) {
-        val db = Firebase.firestore
+        val db = Firebase.firestore // Goi truc tiep, khong can ktx
         
-        // Doc collection ten la "stories"
         db.collection("stories")
             .get()
             .addOnSuccessListener { result ->
-                // Chuyen doi tu Firebase Document sang Story Object
-                val list = result.toObjects(Story::class.java)
-                stories = list
+                try {
+                    val list = result.toObjects(Story::class.java)
+                    stories = list
+                } catch (e: Exception) {
+                    errorMessage = "Lỗi data: ${e.message}"
+                    stories = sampleStories
+                }
                 isLoading = false
             }
             .addOnFailureListener { exception ->
-                errorMessage = "Lỗi Firebase: ${exception.message}"
-                stories = sampleStories // Dung du lieu mau neu loi
+                errorMessage = "Dùng offline: ${exception.message}"
+                stories = sampleStories
                 isLoading = false
             }
     }
@@ -69,13 +71,12 @@ fun HomeScreen(navController: NavController) {
             ) {
                 if (errorMessage.isNotEmpty()) {
                     item {
-                        Text(text = errorMessage, color = Color.Red)
+                        Text(text = errorMessage, color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                     }
                 }
                 
                 items(stories) { story ->
                     StoryItem(story) {
-                        // Uu tien dung Slug
                         val idToPass = if (story.slug.isNotEmpty()) story.slug else story.id
                         navController.navigate("detail/$idToPass")
                     }

@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.truyenoffline.model.Story
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +32,6 @@ fun DetailScreen(navController: NavController, storyId: String?) {
         if (storyId != null) {
             val db = Firebase.firestore
             
-            // 1. Tim theo ID Document
             db.collection("stories").document(storyId).get()
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
@@ -42,7 +41,6 @@ fun DetailScreen(navController: NavController, storyId: String?) {
                         } catch (e: Exception) { e.printStackTrace() }
                         isLoading = false
                     } else {
-                        // 2. Tim theo Slug
                         db.collection("stories")
                             .whereEqualTo("slug", storyId)
                             .get()

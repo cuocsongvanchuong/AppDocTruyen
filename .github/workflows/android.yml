@@ -20,12 +20,9 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    # THEM LENH NAY DE DON DEP CACHE LOI
-    - name: Clean Build
-      run: ./gradlew clean
-
     - name: Build with Gradle
-      run: ./gradlew assembleDebug --stacktrace
+      # THEM CO --info DE HIEN LOI CHI TIET
+      run: ./gradlew assembleDebug --info
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
