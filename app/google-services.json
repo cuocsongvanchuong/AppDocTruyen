@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1046229343718",
+    "project_id": "truyen-quoc-dinh",
+    "storage_bucket": "truyen-quoc-dinh.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1046229343718:android:34457b3c1816a7b283ca27",
+        "android_client_info": {
+          "package_name": "com.example.truyenoffline"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1046229343718-1q45os9qnuk881fjmlmbr657eo6nrt4s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzAfQB4ZCvVLVtKibVoY9g_sM1nhgpK-g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1046229343718-1q45os9qnuk881fjmlmbr657eo6nrt4s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
