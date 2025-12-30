@@ -10,9 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +36,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// DÒNG QUAN TRỌNG NHẤT: Bắt buộc phải có để dùng TopAppBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen() {
@@ -45,7 +44,7 @@ fun HomeScreen() {
         topBar = {
             TopAppBar(
                 title = { Text("Thư Viện Truyện", fontWeight = FontWeight.Bold) },
-                colors = TopAppBarDefaults.topAppBarColors( // DA SUA: Dung ham moi nhat
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             )
@@ -77,7 +76,7 @@ fun StoryItem(story: Story) {
                 modifier = Modifier
                     .width(90.dp)
                     .fillMaxHeight()
-                    .background(Color.Gray),
+                    .background(Color.LightGray),
                 contentScale = ContentScale.Crop
             )
             Column(
@@ -97,13 +96,6 @@ fun StoryItem(story: Story) {
                     text = story.author,
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.DarkGray
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = story.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray,
-                    maxLines = 2
                 )
             }
         }
