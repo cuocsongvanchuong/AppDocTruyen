@@ -17,22 +17,23 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChapterScreen(navController: NavController, slug: String?, chapterNum: Int) {
+fun ChapterScreen(navController: NavController, slug: String?, chapNumStr: String) {
     var content by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
 
-    // Tự động tải nội dung chương khi mở
-    LaunchedEffect(slug, chapterNum) {
+    // Tự động tải khi mở màn hình
+    LaunchedEffect(slug, chapNumStr) {
         if (slug != null) {
+            isLoading = true
             scope.launch {
                 try {
-                    // Gọi GitHub lấy file txt: stories/{slug}/chap-{num}.txt
-                    val text = RetrofitClient.api.getChapterContent(slug, chapterNum)
+                    // Gọi API lấy text
+                    val text = RetrofitClient.api.getChapterContent(slug, chapNumStr)
                     content = text
                 } catch (e: Exception) {
-                    content = "Không tải được chương này. Có thể file chưa được up lên GitHub?\nLỗi: ${e.message}"
+                    content = "Không tải được nội dung.\n\n1. Kiểm tra mạng.\n2. Kiểm tra file trên GitHub: stories/$slug/chap-$chapNumStr.txt có tồn tại không?\n3. Lỗi: ${e.message}"
                 } finally {
                     isLoading = false
                 }
@@ -43,7 +44,7 @@ fun ChapterScreen(navController: NavController, slug: String?, chapterNum: Int) 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Chương $chapterNum") },
+                title = { Text("Chương $chapNumStr") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -64,35 +65,53 @@ fun ChapterScreen(navController: NavController, slug: String?, chapterNum: Int) 
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()
-                    .verticalScroll(scrollState) // Cho phép cuộn dọc
+                    .verticalScroll(scrollState)
                     .padding(16.dp)
             ) {
                 Text(
                     text = content,
                     fontSize = 18.sp,
-                    lineHeight = 28.sp, // Khoảng cách dòng cho dễ đọc
+                    lineHeight = 28.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 
-                // Nút chuyển chương (Đơn giản)
+                // Logic tính toán chương tiếp theo (mô phỏng parseFloat của JS)
+                val currentNum = chapNumStr.toDoubleOrNull() ?: 1.0
+                
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 24.dp, bottom = 24.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 24.dp, bottom = 48.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Button(
-                        enabled = chapterNum > 1,
-                        onClick = { navController.navigate("read/$slug/${chapterNum - 1}") }
+                        enabled = currentNum > 1,
+                        onClick = { 
+                            // Nếu là số nguyên thì bỏ .0 (VD: 1.0 -> 1)
+                            val prev = removeZero(currentNum - 1)
+                            navController.navigate("read/$slug/$prev") 
+                        }
                     ) {
                         Text("Chương trước")
                     }
                     
                     Button(
-                        onClick = { navController.navigate("read/$slug/${chapterNum + 1}") }
+                        onClick = { 
+                            val next = removeZero(currentNum + 1)
+                            navController.navigate("read/$slug/$next") 
+                        }
                     ) {
                         Text("Chương sau")
                     }
                 }
             }
         }
+    }
+}
+
+// Hàm phụ trợ: 1.0 -> "1", 1.5 -> "1.5"
+fun removeZero(value: Double): String {
+    return if (value % 1.0 == 0.0) {
+        value.toInt().toString()
+    } else {
+        value.toString()
     }
 }

@@ -31,7 +31,6 @@ fun DetailScreen(navController: NavController, storyId: String?) {
     LaunchedEffect(storyId) {
         if (storyId != null) {
             val db = Firebase.firestore
-            
             db.collection("stories").document(storyId).get()
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
@@ -41,9 +40,7 @@ fun DetailScreen(navController: NavController, storyId: String?) {
                         } catch (e: Exception) { e.printStackTrace() }
                         isLoading = false
                     } else {
-                        db.collection("stories")
-                            .whereEqualTo("slug", storyId)
-                            .get()
+                        db.collection("stories").whereEqualTo("slug", storyId).get()
                             .addOnSuccessListener { documents ->
                                 if (!documents.isEmpty) {
                                     try {
@@ -56,9 +53,7 @@ fun DetailScreen(navController: NavController, storyId: String?) {
                     }
                 }
                 .addOnFailureListener { isLoading = false }
-        } else {
-            isLoading = false
-        }
+        } else { isLoading = false }
     }
 
     Scaffold(
@@ -70,9 +65,7 @@ fun DetailScreen(navController: NavController, storyId: String?) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
             )
         }
     ) { innerPadding ->
@@ -83,50 +76,24 @@ fun DetailScreen(navController: NavController, storyId: String?) {
         } else if (story != null) {
             val currentStory = story!!
             Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
+                modifier = Modifier.padding(innerPadding).fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AsyncImage(
-                    model = currentStory.coverUrl,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .height(260.dp)
-                        .width(180.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.Gray),
+                    model = currentStory.coverUrl, contentDescription = null,
+                    modifier = Modifier.height(260.dp).width(180.dp).clip(RoundedCornerShape(8.dp)).background(Color.Gray),
                     contentScale = ContentScale.Crop
                 )
-
                 Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = currentStory.title,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-                
-                Text(
-                    text = "Tác giả: ${currentStory.author}",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.DarkGray
-                )
-                
-                Text(
-                    text = "Số chương: ${currentStory.totalChapters}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
+                Text(text = currentStory.title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                Text(text = "Tác giả: ${currentStory.author}", style = MaterialTheme.typography.titleMedium, color = Color.DarkGray)
+                Text(text = "Số chương: ${currentStory.totalChapters}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
                 Spacer(modifier = Modifier.height(24.dp))
-
+                
                 Button(
                     onClick = { 
                         if (currentStory.slug.isNotEmpty()) {
+                            // CHUYỂN "1" DẠNG STRING
                             navController.navigate("read/${currentStory.slug}/1")
                         }
                     },
@@ -135,26 +102,12 @@ fun DetailScreen(navController: NavController, storyId: String?) {
                 ) {
                     Text("ĐỌC NGAY", fontWeight = FontWeight.Bold)
                 }
-
                 Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = "Giới thiệu:",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.align(Alignment.Start)
-                )
-                Text(
-                    text = currentStory.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.DarkGray,
-                    modifier = Modifier.padding(top = 8.dp).align(Alignment.Start)
-                )
+                Text(text = "Giới thiệu:", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.align(Alignment.Start))
+                Text(text = currentStory.description, style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray, modifier = Modifier.padding(top = 8.dp).align(Alignment.Start))
             }
         } else {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Không tìm thấy thông tin truyện!")
-            }
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Không tìm thấy thông tin truyện!") }
         }
     }
 }

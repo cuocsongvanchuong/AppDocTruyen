@@ -25,27 +25,24 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     NavHost(navController = navController, startDestination = "home") {
-                        // 1. Màn hình chính
-                        composable("home") {
-                            HomeScreen(navController)
-                        }
+                        composable("home") { HomeScreen(navController) }
                         
-                        // 2. Màn hình chi tiết
                         composable("detail/{storyId}") { backStackEntry ->
                             val id = backStackEntry.arguments?.getString("storyId")
                             DetailScreen(navController, id)
                         }
                         
-                        // 3. Màn hình đọc truyện (Mới)
+                        // Cập nhật: chapNum là StringType
                         composable(
                             route = "read/{slug}/{chapNum}",
                             arguments = listOf(
                                 navArgument("slug") { type = NavType.StringType },
-                                navArgument("chapNum") { type = NavType.IntType }
+                                navArgument("chapNum") { type = NavType.StringType }
                             )
                         ) { backStackEntry ->
                             val slug = backStackEntry.arguments?.getString("slug")
-                            val chapNum = backStackEntry.arguments?.getInt("chapNum") ?: 1
+                            // Mặc định là "1" nếu null
+                            val chapNum = backStackEntry.arguments?.getString("chapNum") ?: "1"
                             ChapterScreen(navController, slug, chapNum)
                         }
                     }

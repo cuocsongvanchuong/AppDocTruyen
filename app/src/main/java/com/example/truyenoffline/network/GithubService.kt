@@ -6,17 +6,19 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-// URL Repo cua ban
-const val BASE_URL = "https://raw.githubusercontent.com/nguyenquynhduc/truyen-quoc-dinh-data/main/"
+// --- CẤU HÌNH QUAN TRỌNG ---
+// Bạn hãy thay thông tin khớp với APP_CONFIG trong file JS
+// Ví dụ: https://raw.githubusercontent.com/TAI_KHOAN_CUA_BAN/TEN_REPO/TEN_NHANH/
+const val BASE_URL = "https://raw.githubusercontent.com/nguyenquynhduc/truyen-quoc-dinh-data/main/" 
 
 interface GithubApi {
-    @GET("data/stories.json") 
-    suspend fun getStoryList(): List<Story>
-
+    // Lấy nội dung chương
+    // Logic JS: stories/${slug}/chap-${numInput}.txt
+    // Ở đây ta dùng String cho chapNum để hỗ trợ cả chương 1.5, 10-1...
     @GET("stories/{slug}/chap-{chapNum}.txt")
     suspend fun getChapterContent(
         @Path("slug") slug: String,
-        @Path("chapNum") chapNum: Int
+        @Path("chapNum") chapNum: String
     ): String
 }
 
