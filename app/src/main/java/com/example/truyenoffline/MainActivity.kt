@@ -36,7 +36,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// DÒNG QUAN TRỌNG NHẤT: Bắt buộc phải có để dùng TopAppBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen() {
@@ -44,7 +43,7 @@ fun HomeScreen() {
         topBar = {
             TopAppBar(
                 title = { Text("Thư Viện Truyện", fontWeight = FontWeight.Bold) },
-                colors = TopAppBarDefaults.topAppBarColors(
+                colors = TopAppBarDefaults.smallTopAppBarColors( // BAN CU DUNG HAM NAY
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             )
