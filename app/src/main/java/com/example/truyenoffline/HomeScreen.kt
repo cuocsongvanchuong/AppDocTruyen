@@ -32,10 +32,15 @@ fun HomeScreen(navController: NavController) {
     LaunchedEffect(Unit) {
         scope.launch {
             try {
+                // Thu tai tu GitHub
                 val list = RetrofitClient.api.getStoryList()
-                stories = list
+                if (list.isNotEmpty()) {
+                    stories = list
+                } else {
+                    stories = sampleStories
+                }
             } catch (e: Exception) {
-                errorMessage = "Lỗi mạng: ${e.message}"
+                errorMessage = "Dùng dữ liệu mẫu (Offline)"
                 stories = sampleStories
             } finally {
                 isLoading = false
@@ -64,13 +69,15 @@ fun HomeScreen(navController: NavController) {
             ) {
                 if (errorMessage.isNotEmpty()) {
                     item {
-                        Text(text = errorMessage, color = Color.Red, modifier = Modifier.padding(bottom = 8.dp))
+                        Text(text = errorMessage, color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                     }
                 }
                 
                 items(stories) { story ->
                     StoryItem(story) {
-                        navController.navigate("detail/${story.slug}")
+                        // QUAN TRONG: Phai truyen slug, neu slug rong thi dung id
+                        val idToPass = if (story.slug.isNotEmpty()) story.slug else story.id
+                        navController.navigate("detail/$idToPass")
                     }
                 }
             }
@@ -120,7 +127,7 @@ fun StoryItem(story: Story, onClick: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Số chương: ${story.totalChapters}",
+                    text = "Chương: ${story.totalChapters}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
