@@ -18,8 +18,8 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.truyenoffline.model.Story
 import com.example.truyenoffline.model.sampleStories
-import com.example.truyenoffline.network.RetrofitClient
-import kotlinx.coroutines.launch
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,31 +27,31 @@ fun HomeScreen(navController: NavController) {
     var stories by remember { mutableStateOf<List<Story>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
-    val scope = rememberCoroutineScope()
 
+    // Tu dong tai du lieu tu Firebase
     LaunchedEffect(Unit) {
-        scope.launch {
-            try {
-                // Thu tai tu GitHub
-                val list = RetrofitClient.api.getStoryList()
-                if (list.isNotEmpty()) {
-                    stories = list
-                } else {
-                    stories = sampleStories
-                }
-            } catch (e: Exception) {
-                errorMessage = "Dùng dữ liệu mẫu (Offline)"
-                stories = sampleStories
-            } finally {
+        val db = Firebase.firestore
+        
+        // Doc collection ten la "stories"
+        db.collection("stories")
+            .get()
+            .addOnSuccessListener { result ->
+                // Chuyen doi tu Firebase Document sang Story Object
+                val list = result.toObjects(Story::class.java)
+                stories = list
                 isLoading = false
             }
-        }
+            .addOnFailureListener { exception ->
+                errorMessage = "Lỗi Firebase: ${exception.message}"
+                stories = sampleStories // Dung du lieu mau neu loi
+                isLoading = false
+            }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Kho Truyện Online", fontWeight = FontWeight.Bold) },
+                title = { Text("Truyện Firebase", fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
@@ -69,13 +69,13 @@ fun HomeScreen(navController: NavController) {
             ) {
                 if (errorMessage.isNotEmpty()) {
                     item {
-                        Text(text = errorMessage, color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                        Text(text = errorMessage, color = Color.Red)
                     }
                 }
                 
                 items(stories) { story ->
                     StoryItem(story) {
-                        // QUAN TRONG: Phai truyen slug, neu slug rong thi dung id
+                        // Uu tien dung Slug
                         val idToPass = if (story.slug.isNotEmpty()) story.slug else story.id
                         navController.navigate("detail/$idToPass")
                     }
@@ -119,15 +119,13 @@ fun StoryItem(story: Story, onClick: () -> Unit) {
                     color = Color.Black,
                     maxLines = 1
                 )
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = story.author,
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.DarkGray
                 )
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Chương: ${story.totalChapters}",
+                    text = "${story.totalChapters} chương",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
